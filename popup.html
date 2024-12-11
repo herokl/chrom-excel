@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>道长.小工具-导出表格插件</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            width: 200px;
+            text-align: center;
+        }
+
+        h3 {
+            margin-bottom: 20px;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* 滑块样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+
+<body>
+    <h3>导出网页表格</h3>
+    <button id="exportTableBtn">导出表格为 Excel</button>
+    <h3>导出表格插件</h3>
+    <div class="toggle-container">
+        <span>开关</span>
+        <label class="switch">
+            <input type="checkbox" id="toggle-switch">
+            <span class="slider round"></span>
+        </label>
+    </div>
+    <script src="popup.js"></script>
+</body>
+
+</html>
