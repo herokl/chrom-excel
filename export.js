@@ -126,6 +126,8 @@
         const workbook = XLSX.utils.book_new();
         tables.forEach((table, index) => {
             const worksheet = XLSX.utils.table_to_sheet(table);
+            const totalColumns = XLSX.utils.decode_range(worksheet['!ref']).e.c + 1; // 获取总列数
+            worksheet['!cols'] = Array(totalColumns).fill({ wch: 25 }); // 每一列的宽度为25
 
             // 🔥 遍历每一个单元格，处理长整型和时间戳
             Object.keys(worksheet).forEach(cell => {
@@ -157,9 +159,9 @@
 
             // 3️⃣ 美化表头样式
             const headerStyle = {
-                font: { bold: true, color: { rgb: "FFFFFF" } },
-                fill: { fgColor: { rgb: "4F81BD" } }, // 浅蓝色
-                alignment: { horizontal: 'center', vertical: 'center' }
+                font: { bold: true, sz: 17, color: { rgb: 'FFFFFF' } }, // 加粗、字体大小14、字体白色
+                fill: { fgColor: { rgb: '4F81BD' } }, // 浅蓝色背景
+                alignment: { horizontal: 'center', vertical: 'center' } // 水平垂直居中
             };
 
             const range = XLSX.utils.decode_range(worksheet['!ref']);
@@ -171,8 +173,8 @@
             }
 
             // 4️⃣ 隔行变色 (奇数白色，偶数灰色)
-            const oddRowColor = "FFFFFF";
-            const evenRowColor = "F2F2F2";
+            const oddRowColor = 'FFFFFF';
+            const evenRowColor = 'F2F2F2';
 
             for (let R = 1; R <= range.e.r; R++) { // 从第1行（去掉表头）开始遍历
                 const backgroundColor = (R % 2 === 0) ? evenRowColor : oddRowColor;
