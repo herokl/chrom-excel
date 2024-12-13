@@ -1,6 +1,7 @@
 (function () {
     let exportButton = null;
     let isEnabled = false;
+    let selectedWorkSheets = []; // 存储选中的工作表
     let selectedTables = []; // 存储选中的表格
     let handleClickOnTable; // 将事件处理器设置为全局变量，便于后续删除监听器
 
@@ -12,14 +13,19 @@
                 const table = event.target.closest('table'); // 找到离点击点最近的表格
 
                 if (!table) return; // 如果点击的不是表格，则不处理
+                const worksheet = XLSX.utils.table_to_sheet(table);
+                const worksheetString = JSON.stringify(worksheet);
 
-                if (selectedTables.includes(table)) {
+                if (selectedWorkSheets.includes(worksheetString)
+                    && selectedTables.includes(table)) {
                     // 如果表格已选中，则取消选中
                     table.style.border = '';
+                    selectedWorkSheets = selectedWorkSheets.filter(t => t !== worksheetString);
                     selectedTables = selectedTables.filter(t => t !== table);
                 } else {
                     // 如果表格未选中，则选中表格
                     table.style.border = '3px solid black'; // 给表格加红色边框
+                    selectedWorkSheets.push(worksheetString);
                     selectedTables.push(table);
                 }
 
@@ -49,7 +55,7 @@
             exportButton = document.createElement('button');
             exportButton.textContent = '导出表格';
             exportButton.style.position = 'fixed';
-            exportButton.style.top = '10px';
+            exportButton.style.bottom = '10px';
             exportButton.style.right = '10px';
             exportButton.style.zIndex = 9999;
             exportButton.style.padding = '10px 20px';
@@ -59,8 +65,9 @@
             exportButton.style.borderRadius = '5px';
             exportButton.style.cursor = 'pointer';
             document.body.appendChild(exportButton);
+
             exportButton.addEventListener('click', () => {
-                exportTable(selectedTables);
+                exportTable(selectedWorkSheets);
             });
             //开启监听
             enableTableClick();
@@ -117,15 +124,15 @@
     }
 
     // 表格导出逻辑
-    function exportTable(tables, filename = '导出表格.xlsx') {
-        if (tables.length === 0) {
+    function exportTable(worksheets, filename = '导出表格.xlsx') {
+        if (worksheets.length === 0) {
             alert('请先点击一个或多个表格！');
             return;
         }
 
         const workbook = XLSX.utils.book_new();
-        tables.forEach((table, index) => {
-            const worksheet = XLSX.utils.table_to_sheet(table);
+        worksheets.forEach((worksheet, index) => {
+            worksheet = JSON.parse(worksheet);
             const totalColumns = XLSX.utils.decode_range(worksheet['!ref']).e.c + 1; // 获取总列数
             worksheet['!cols'] = Array(totalColumns).fill({ wch: 25 }); // 每一列的宽度为25
 
@@ -203,7 +210,7 @@
             selectedTables.forEach((table) => {
                 table.style.border = '';
             });
-            selectedTables = [];
+            selectedWorkSheets = [];
             //移除监听器
             disableTableClick();
         }
