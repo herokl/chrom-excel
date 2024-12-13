@@ -32,7 +32,7 @@
       ],
       "js": [
         "export.js",
-        "xlsx.js"
+        "/xlsx.min.js"
       ],
       "run_at": "document_end"
     }
@@ -40,7 +40,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "xlsx.js"
+        "xlsx.min.js"
       ],
       "matches": [
         "<all_urls>"

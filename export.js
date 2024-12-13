@@ -201,7 +201,7 @@
         if (!userFilename) return; // 用户未输入文件名
         const finalFilename = userFilename.endsWith('.xlsx') ? userFilename : `${userFilename}.xlsx`;
 
-        XLSX.writeFile(workbook, finalFilename);
+        XLSX.writeFile(workbook, finalFilename, { cellStyles: true });
     }
 
     //还原页面状态
