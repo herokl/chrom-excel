@@ -13,7 +13,7 @@
                 const table = event.target.closest('table'); // 找到离点击点最近的表格
 
                 if (!table) return; // 如果点击的不是表格，则不处理
-                const worksheet = XLSX.utils.table_to_sheet(table);
+                const worksheet = XLSX.utils.table_to_sheet(table, { raw: true });
                 const worksheetString = JSON.stringify(worksheet);
 
                 if (selectedWorkSheets.includes(worksheetString)
@@ -91,6 +91,54 @@
         });
     }
 
+    /**
+     * 获取当前机器时间时区是否存在时间误差
+     * @param {Date} date 比对的误差时间
+     * @returns {Number} 误差毫秒
+     */
+    function getTimezoneOffsetMS(date) {
+        var time = date.getTime();
+        var utcTime = Date.UTC(date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            date.getHours(),
+            date.getMinutes(),
+            date.getSeconds(),
+            date.getMilliseconds());
+        return time - utcTime;
+    }
+
+    /**
+     * 矫正日期误差
+     * @param {Date} date 需要矫正的日期
+     * @returns {Date} 返回矫正后的日期
+     */
+    function fixDate(date) {
+        const importBugHotfixDiff = (function () {
+            const basedate = new Date(1899, 11, 30, 0, 0, 0);
+            const dnthreshAsIs = (new Date().getTimezoneOffset() - basedate.getTimezoneOffset()) * 60000;
+            const dnthreshToBe = getTimezoneOffsetMS(new Date()) - getTimezoneOffsetMS(basedate);
+            return dnthreshAsIs - dnthreshToBe;
+        }());
+        return (new Date(date.getTime() + importBugHotfixDiff));
+    }
+
+
+    /**
+     * 是否需要矫正日期
+     * @param {Date} date 需要判断的日期
+     * @returns {Boolean}  是否需要矫正
+     */
+    function isNeedFixDate(date) {
+        const baseDate = new Date(1899, 11, 30, 0, 0, 0);
+        const baseDateUtc = new Date(Date.UTC(1899, 11, 30, 0, 0, 0));
+        const timezoneOffsetFix =
+            baseDateUtc.valueOf() +
+            baseDate.getTimezoneOffset() * 60000 -
+            baseDate.valueOf();
+        return new Date(date.valueOf() - timezoneOffsetFix).getTimezoneOffset() !== baseDate.getTimezoneOffset();
+    }
+
     // 日期转换函数
     function formatExcelDate(serial) {
         var utc_days = Math.floor(serial - 25569);
@@ -113,6 +161,10 @@
 
     // 日期转换函数
     function formatDate(date) {
+        //矫正日期
+        if (isNeedFixDate(date)) {
+            date = fixDate(date);
+        }
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，需要加1，并确保两位数
         const day = date.getDate().toString().padStart(2, '0'); // 日期确保两位数
