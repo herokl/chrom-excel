@@ -4,7 +4,7 @@
 点击按钮即可导出当前页面的表格数据
 
 ## 安装
-下载[chrom-excel.crx](chrom-excle.crx)文件，然后拖动到浏览器扩展程序页面即可
+下载[chrom-excel.crx](https://github.com/herokl/chrom-excel/blob/main/chrom-excel.crx)文件，然后拖动到浏览器扩展程序页面即可
 ### Chrome
 
 1. 打开 Chrome 浏览器
